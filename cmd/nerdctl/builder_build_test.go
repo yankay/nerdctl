@@ -504,6 +504,7 @@ func buildWithNamedBuilder(base *testutil.Base, builderName string, args ...stri
 	if testutil.GetTarget() == testutil.Docker {
 		buildArgs = append(buildArgs, "--builder", builderName)
 	}
+	buildArgs = append(buildArgs, args...)
 	return base.Cmd(buildArgs...)
 }
 
