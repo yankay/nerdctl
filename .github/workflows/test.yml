@@ -255,9 +255,9 @@ jobs:
         run: |
           sudo apt-get install -y expect
       - name: "Ensure that the integration test suite is compatible with Docker"
-        run: go test -timeout 20m -run ^TestBuildAttestation$ -v -exec sudo ./cmd/nerdctl/... -args -test.target=docker -test.kill-daemon
+        run: go test -v -timeout 20m -run ^TestBuildAttestation$ -v -exec sudo ./cmd/nerdctl/... -args -test.target=docker -test.kill-daemon
       - name: "Ensure that the IPv6 integration test suite is compatible with Docker"
-        run: go test -timeout 20m -run ^TestBuildAttestation$ -v -exec sudo ./cmd/nerdctl/... -args -test.target=docker -test.kill-daemon -test.ipv6
+        run: go test -v -timeout 20m -run ^TestBuildAttestation$ -v -exec sudo ./cmd/nerdctl/... -args -test.target=docker -test.kill-daemon -test.ipv6
 
   # test-integration-windows:
   #   runs-on: windows-2022

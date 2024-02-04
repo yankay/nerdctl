@@ -505,6 +505,10 @@ func TestBuildAttestation(t *testing.T) {
 	t.Parallel()
 	testutil.RequiresBuild(t)
 	base := testutil.NewBase(t)
+
+	fmt.Println(base.Cmd("buildx", "create", "--name eager_beaver", "--bootstrap", "--use").Out())
+	fmt.Println(base.Cmd("buildx", "ls").Out())
+
 	// if testutil.GetTarget() == testutil.Docker {
 	// 	base.Env = append(base.Env, "DOCKER_BUILDKIT=1")
 	// }
