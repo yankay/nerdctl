@@ -521,7 +521,7 @@ func TestBuildAttestation(t *testing.T) {
 
 	// Test sbom
 	outputSBOMDir := t.TempDir()
-	base.Cmd("build", "--sbom=true", "-o", fmt.Sprintf("type=local,dest=%s", outputSBOMDir), buildCtx).AssertOK()
+	base.Cmd("buildx", "build", "--builder", "eager_beaver", "--sbom=true", "-o", fmt.Sprintf("type=local,dest=%s", outputSBOMDir), buildCtx).AssertOK()
 	const testSBOMFileName = "sbom.spdx.json"
 	testSBOMFilePath := filepath.Join(outputSBOMDir, testSBOMFileName)
 	if _, err := os.Stat(testSBOMFilePath); err != nil {
@@ -530,7 +530,7 @@ func TestBuildAttestation(t *testing.T) {
 
 	// Test provenance
 	outputProvenanceDir := t.TempDir()
-	base.Cmd("build", "--provenance=mode=min", "-o", fmt.Sprintf("type=local,dest=%s", outputProvenanceDir), buildCtx).AssertOK()
+	base.Cmd("build", "--builder", "eager_beaver", "--provenance=mode=min", "-o", fmt.Sprintf("type=local,dest=%s", outputProvenanceDir), buildCtx).AssertOK()
 	const testProvenanceFileName = "provenance.json"
 	testProvenanceFilePath := filepath.Join(outputProvenanceDir, testProvenanceFileName)
 	if _, err := os.Stat(testProvenanceFilePath); err != nil {
@@ -539,7 +539,7 @@ func TestBuildAttestation(t *testing.T) {
 
 	// Test attestation
 	outputAttestationDir := t.TempDir()
-	base.Cmd("build", "--attest=type=provenance,mode=min", "--attest=type=sbom", "-o", fmt.Sprintf("type=local,dest=%s", outputAttestationDir), buildCtx).AssertOK()
+	base.Cmd("build", "--builder", "eager_beaver", "--attest=type=provenance,mode=min", "--attest=type=sbom", "-o", fmt.Sprintf("type=local,dest=%s", outputAttestationDir), buildCtx).AssertOK()
 	testSBOMFilePath = filepath.Join(outputAttestationDir, testSBOMFileName)
 	testProvenanceFilePath = filepath.Join(outputAttestationDir, testProvenanceFileName)
 	if _, err := os.Stat(testSBOMFilePath); err != nil {
