@@ -500,18 +500,16 @@ func TestBuildNetworkShellCompletion(t *testing.T) {
 }
 
 func TestBuildAttestation(t *testing.T) {
-	// testutil.DockerIncompatible(t) // ref:https://github.com/docker/buildx/issues/1655
-
 	t.Parallel()
 	testutil.RequiresBuild(t)
 	base := testutil.NewBase(t)
-
-	fmt.Println(base.Cmd("buildx", "create", "--name", "eager_beaver", "--bootstrap", "--use").Out())
-	fmt.Println(base.Cmd("buildx", "ls").Out())
-
-	// if testutil.GetTarget() == testutil.Docker {
-	// 	base.Env = append(base.Env, "DOCKER_BUILDKIT=1")
-	// }
+	if testutil.GetTarget() == testutil.Docker {
+		// create named builder for docker
+		builderName := testutil.Identifier(t)
+		defer base.Cmd("buildx", "rm", builderName).AssertOK()
+		base.Cmd("buildx", "create", "--name", builderName, "--bootstrap", "--use").AssertOK()
+		base.Args = append(base.Args, "--builder", builderName)
+	}
 	defer base.Cmd("builder", "prune").Run()
 
 	dockerfile := "FROM " + testutil.NginxAlpineImage
@@ -521,7 +519,7 @@ func TestBuildAttestation(t *testing.T) {
 
 	// Test sbom
 	outputSBOMDir := t.TempDir()
-	base.Cmd("buildx", "build", "--builder", "eager_beaver", "--sbom=true", "-o", fmt.Sprintf("type=local,dest=%s", outputSBOMDir), buildCtx).AssertOK()
+	base.Cmd("build", "--sbom=true", "-o", fmt.Sprintf("type=local,dest=%s", outputSBOMDir), buildCtx).AssertOK()
 	const testSBOMFileName = "sbom.spdx.json"
 	testSBOMFilePath := filepath.Join(outputSBOMDir, testSBOMFileName)
 	if _, err := os.Stat(testSBOMFilePath); err != nil {
@@ -530,7 +528,7 @@ func TestBuildAttestation(t *testing.T) {
 
 	// Test provenance
 	outputProvenanceDir := t.TempDir()
-	base.Cmd("build", "--builder", "eager_beaver", "--provenance=mode=min", "-o", fmt.Sprintf("type=local,dest=%s", outputProvenanceDir), buildCtx).AssertOK()
+	base.Cmd("build", "--provenance=mode=min", "-o", fmt.Sprintf("type=local,dest=%s", outputProvenanceDir), buildCtx).AssertOK()
 	const testProvenanceFileName = "provenance.json"
 	testProvenanceFilePath := filepath.Join(outputProvenanceDir, testProvenanceFileName)
 	if _, err := os.Stat(testProvenanceFilePath); err != nil {
@@ -539,7 +537,7 @@ func TestBuildAttestation(t *testing.T) {
 
 	// Test attestation
 	outputAttestationDir := t.TempDir()
-	base.Cmd("build", "--builder", "eager_beaver", "--attest=type=provenance,mode=min", "--attest=type=sbom", "-o", fmt.Sprintf("type=local,dest=%s", outputAttestationDir), buildCtx).AssertOK()
+	base.Cmd("build", "--attest=type=provenance,mode=min", "--attest=type=sbom", "-o", fmt.Sprintf("type=local,dest=%s", outputAttestationDir), buildCtx).AssertOK()
 	testSBOMFilePath = filepath.Join(outputAttestationDir, testSBOMFileName)
 	testProvenanceFilePath = filepath.Join(outputAttestationDir, testProvenanceFileName)
 	if _, err := os.Stat(testSBOMFilePath); err != nil {
