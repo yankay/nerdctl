@@ -5,7 +5,7 @@
 
 # nerdctl: Docker-compatible CLI for containerd
 
-<img src="docs/images/nerdctl.svg" alt="logo" style="background-color: white;">
+![logo light mode](docs/images/nerdctl.svg#gh-light-mode-only)
 
 `nerdctl` is a Docker-compatible CLI for [contai**nerd**](https://containerd.io).
 
